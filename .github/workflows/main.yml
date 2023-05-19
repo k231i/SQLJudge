@@ -34,5 +34,5 @@ jobs:
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
         
       - name: Deploy core
-        run: rsync -avz ./sqljudgeapi ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/k231i/sqljudgeapi
+        run: rsync -avz ./sqljudgeapi ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/k231i
       
