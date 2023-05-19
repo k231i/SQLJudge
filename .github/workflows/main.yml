@@ -20,7 +20,7 @@ jobs:
         run: dotnet restore SQLJudge.ApiServer/SQLJudge.ApiServer.csproj
         
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build --no-restore SQLJudge.ApiServer/SQLJudge.ApiServer.csproj
         
       - name: Publish
         run: dotnet publish SQLJudge.ApiServer/SQLJudge.ApiServer.csproj -c Release -o sqljudgeapi
