@@ -1,0 +1,38 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+          
+      - name: Restore dependencies
+        run: dotnet restore SQLJudge.ApiServer/SQLJudge.ApiServer.csproj
+        
+      - name: Build
+        run: dotnet build --no-restore SQLJudge.ApiServer/SQLJudge.ApiServer.csproj
+        
+      - name: Publish
+        run: dotnet publish SQLJudge.ApiServer/SQLJudge.ApiServer.csproj -c Debug -o sqljudgeapi
+      
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+        
+      - name: Deploy core
+        run: rsync -avz ./sqljudgeapi ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/k231i
+      
