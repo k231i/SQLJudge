@@ -17,13 +17,13 @@ jobs:
           dotnet-version: 7.0.x
           
       - name: Restore dependencies
-        run: dotnet restore SQLJudge.ApiServer.csproj
+        run: dotnet restore SQLJudge.ApiServer/SQLJudge.ApiServer.csproj
         
       - name: Build
         run: dotnet build --no-restore
         
       - name: Publish
-        run: dotnet publish SQLJudge.ApiServer.csproj -c Release -o sqljudgeapi
+        run: dotnet publish SQLJudge.ApiServer/SQLJudge.ApiServer.csproj -c Release -o sqljudgeapi
       
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
