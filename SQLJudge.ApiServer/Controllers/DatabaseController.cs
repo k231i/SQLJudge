@@ -19,7 +19,7 @@ namespace SQLJudge.ApiServer.Controllers
 			_configuration = configuration;
 		}
 
-		[HttpPost("create")]
+		[HttpGet("create")]
 		public ActionResult Create(int databaseId)
 		{
 			if (DatabaseManager.CreateDatabase(databaseId))
@@ -30,7 +30,7 @@ namespace SQLJudge.ApiServer.Controllers
 			return Ok();
 		}
 
-		[HttpPost("forcecreate")]
+		[HttpGet("forcecreate")]
 		public ActionResult ForceCreate(int databaseId)
 		{
 			DatabaseManager.CreateDatabase(databaseId, true);
