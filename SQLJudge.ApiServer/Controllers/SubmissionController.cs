@@ -9,10 +9,12 @@ namespace SQLJudge.ApiServer.Controllers
 	public class SubmissionController : ControllerBase
 	{
 		private readonly ILogger<SubmissionController> _logger;
+		private readonly IConfiguration _configuration;
 
-		public SubmissionController(ILogger<SubmissionController> logger)
+		public SubmissionController(ILogger<SubmissionController> logger, IConfiguration configuration)
 		{
 			_logger = logger;
+			_configuration = configuration;
 		}
 
 		public ActionResult CheckSubmissions(IEnumerable<int> submissionIds)
@@ -28,7 +30,7 @@ namespace SQLJudge.ApiServer.Controllers
 			{
 				try
 				{
-					SubmissionChecker.CheckSubmission(submissionId);
+					SubmissionChecker.CheckSubmission(_configuration, submissionId);
 				}
 				catch (Exception ex)
 				{

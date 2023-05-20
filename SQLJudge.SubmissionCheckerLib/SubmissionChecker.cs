@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using SQLJudge.DatabaseLib;
 using Newtonsoft.Json;
 using System.Data;
+using Microsoft.Extensions.Configuration;
 
 namespace SQLJudge.SubmissionCheckerLib
 {
@@ -23,13 +24,13 @@ namespace SQLJudge.SubmissionCheckerLib
 			UnknownError = 6
 		}
 
-		public static void CheckSubmission(int submissionId)
+		public static void CheckSubmission(IConfiguration configuration, int submissionId)
 		{
 			int dbId, timeLimit, sqljSubmissionId;
 			string dbName, dbms, checkScript, correctAnswer, correctOutput, mustContain, input;
 
 			using (var db = DatabaseProviderFactory.GetProvider("MySqlDatabaseProvider",
-				ConfigurationManager.ConnectionStrings["MoodleDB"].ConnectionString))
+				configuration.GetConnectionString("MoodleDB")))
 			{
 				var select = db.ExecuteQuery($"""
 					SELECT jdb.id AS dbid
@@ -72,7 +73,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			if (input.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
 				.Any(x => x.StartsWith("\\")))
 			{
-				SetStatus(sqljSubmissionId, SqljSubmissionStatus.ContainsRestrictedFunctions, """
+				SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.ContainsRestrictedFunctions, """
 					Answer contains functions starting with \
 					""");
 
@@ -118,7 +119,7 @@ namespace SQLJudge.SubmissionCheckerLib
 
 			if (!string.IsNullOrEmpty(outputMessage))
 			{
-				SetStatus(sqljSubmissionId,
+				SetStatus(configuration, sqljSubmissionId,
 					SqljSubmissionStatus.BannedOrRequiredWordsContent,
 					outputMessage.TrimEnd('\n'));
 				return;
@@ -129,21 +130,21 @@ namespace SQLJudge.SubmissionCheckerLib
 			{
 				if (!db.CheckDatabaseExists(dbName))
 				{
-					DatabaseManager.CreateDatabase(dbId);
+					DatabaseManager.CreateDatabase(configuration, dbId);
 				}
 			}
 
 			if (string.IsNullOrEmpty(correctOutput))
 			{
 				correctOutput = GenerateCorrectOutput(
-					dbName, dbms, correctAnswer, checkScript, sqljSubmissionId);
+					configuration, dbName, dbms, correctAnswer, checkScript, sqljSubmissionId);
 			}
 
 			var correctOutputResult = JsonConvert.DeserializeObject<DataSet>(correctOutput);
 			DataSet inputResult;
 
 			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
-				ConfigurationManager.ConnectionStrings[dbms].ConnectionString + $"Database={dbName}"))
+				configuration.GetConnectionString(dbms) + $"Database={dbName}"))
 			{
 				var transaction = db.BeginTransaction();
 
@@ -176,6 +177,7 @@ namespace SQLJudge.SubmissionCheckerLib
 		}
 
 		public static string GenerateCorrectOutput(
+			IConfiguration configuration,
 			string dbName, 
 			string dbms, 
 			string correctAnswer,
@@ -185,7 +187,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			string correctOutput;
 
 			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
-				ConfigurationManager.ConnectionStrings[dbms].ConnectionString + $"Database={dbName}"))
+				configuration.GetConnectionString(dbms) + $"Database={dbName}"))
 			{
 				var transaction = db.BeginTransaction();
 
@@ -197,7 +199,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			}
 
 			using (var db = DatabaseProviderFactory.GetProvider("MySqlDatabaseProvider",
-				ConfigurationManager.ConnectionStrings["MoodleDB"].ConnectionString))
+				configuration.GetConnectionString("MoodleDB")))
 			{
 				db.ExecuteQuery($"""
 					UPDATE mdl_assignment_sqlj_submission
@@ -209,10 +211,14 @@ namespace SQLJudge.SubmissionCheckerLib
 			return correctOutput;
 		}
 
-		public static void SetStatus(int sqljSubmissionId, SqljSubmissionStatus status, string output)
+		public static void SetStatus(
+			IConfiguration configuration, 
+			int sqljSubmissionId, 
+			SqljSubmissionStatus status, 
+			string output)
 		{
 			using (var db = DatabaseProviderFactory.GetProvider("MySqlDatabaseProvider",
-				ConfigurationManager.ConnectionStrings["MoodleDB"].ConnectionString))
+				configuration.GetConnectionString("MoodleDB")))
 			{
 				db.ExecuteQuery($"""
 					UPDATE mdl_assignment_sqlj_submission
