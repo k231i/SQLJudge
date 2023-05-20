@@ -169,11 +169,11 @@ namespace SQLJudge.SubmissionCheckerLib
 
 			if (AreDataSetsEqual(correctOutputResult, inputResult))
 			{
-				SetStatus(sqljSubmissionId, SqljSubmissionStatus.Accepted, "");
+				SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.Accepted, "");
 				return;
 			}
 
-			SetStatus(sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, "");
+			SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, "");
 		}
 
 		public static string GenerateCorrectOutput(
