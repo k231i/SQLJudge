@@ -7,18 +7,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace SQLJudge.SubmissionCheckerLib
 {
 	public static class DatabaseManager
 	{
-		public static bool CreateDatabase(int databaseId, bool forceCreate = false)
+		public static bool CreateDatabase(IConfiguration configuration, int databaseId, bool forceCreate = false)
 		{
 			var dbName = $"db{databaseId}";
 			string dbms, dbCreationScript, createDatabasePart, createTablesPart;
 
 			using (var db = DatabaseProviderFactory.GetProvider("MySqlDatabaseProvider",
-				ConfigurationManager.ConnectionStrings["MoodleDB"].ConnectionString))
+				configuration.GetConnectionString("MoodleDB")))
 			{
 				var select = db.ExecuteQuery($"""
 					SELECT dbms
@@ -32,7 +33,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			}
 
 			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
-				ConfigurationManager.ConnectionStrings[dbms].ConnectionString))
+				configuration.GetConnectionString(dbms)))
 			{
 				if (db.CheckDatabaseExists(dbName))
 				{
@@ -44,14 +45,14 @@ namespace SQLJudge.SubmissionCheckerLib
 					db.ExecuteQuery($"DROP DATABASE {dbName};", false);
 				}
 
-				(createDatabasePart, createTablesPart) = 
+				(createDatabasePart, createTablesPart) =
 					PrepareDbCreationScript(dbCreationScript, dbName);
 
 				db.ExecuteQuery(createDatabasePart, false);
 			}
 
 			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
-				ConfigurationManager.ConnectionStrings[dbms].ConnectionString + $"Database={dbName}"))
+				configuration.GetConnectionString(dbms) + $"Database={dbName}"))
 			{
 				db.ExecuteQuery(createTablesPart, false);
 			}
