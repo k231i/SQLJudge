@@ -155,7 +155,7 @@ namespace SQLJudge.SubmissionCheckerLib
 				}
 				catch
 				{
-					SetStatus(sqljSubmissionId, SqljSubmissionStatus.TimeLimitExceeded, $"""
+					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.TimeLimitExceeded, $"""
 						Time limit of {timeLimit} seconds has been exceeded, or an unknown error occured
 						""");
 
