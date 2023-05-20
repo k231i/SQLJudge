@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using MySql.Data.MySqlClient;
 
 namespace SQLJudge.SubmissionCheckerLib
 {
@@ -13,7 +15,7 @@ namespace SQLJudge.SubmissionCheckerLib
 		public static bool CreateDatabase(int databaseId, bool forceCreate = false)
 		{
 			var dbName = $"db{databaseId}";
-			string dbms, dbCreationScript;
+			string dbms, dbCreationScript, createDatabasePart, createTablesPart;
 
 			using (var db = DatabaseProviderFactory.GetProvider("MySqlDatabaseProvider",
 				ConfigurationManager.ConnectionStrings["MoodleDB"].ConnectionString))
@@ -42,22 +44,33 @@ namespace SQLJudge.SubmissionCheckerLib
 					db.ExecuteQuery($"DROP DATABASE {dbName};", false);
 				}
 
-				dbCreationScript = PrepareDbCreationScript(dbCreationScript, dbName);
+				(createDatabasePart, createTablesPart) = 
+					PrepareDbCreationScript(dbCreationScript, dbName);
 
-				db.ExecuteQuery(dbCreationScript, false);
-
-				return true;
+				db.ExecuteQuery(createDatabasePart, false);
 			}
+
+			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
+				ConfigurationManager.ConnectionStrings[dbms].ConnectionString + $"Database={dbName}"))
+			{
+				db.ExecuteQuery(createTablesPart, false);
+			}
+
+			return true;
 		}
 
-		public static string PrepareDbCreationScript(string script, string dbName)
+		public static (string, string) PrepareDbCreationScript(string script, string dbName)
 		{
-			// replace db name in CREATE DATABASE to dbName
+			string createDatabasePart = $"CREATE DATABASE {dbName}";
 
+			if (!script.Contains("CREATE DATABASE", StringComparison.CurrentCultureIgnoreCase))
+			{
+				return (createDatabasePart, script);
+			}
 
-
-
-			return script;
+			return (createDatabasePart, Regex.Replace(script, 
+				@"(CREATE\s+DATABASE.*?;|\\c.*?;|USE\s+\w+;)", "", 
+				RegexOptions.IgnoreCase | RegexOptions.Multiline));
 		}
 	}
 }
