@@ -49,6 +49,12 @@ namespace SQLJudge.SubmissionCheckerLib
 				(createDatabasePart, createTablesPart) =
 					PrepareDbCreationScript(dbCreationScript, dbName);
 
+				db.ExecuteQuery(createDatabasePart, false);
+			}
+
+			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
+				configuration.GetConnectionString(dbms) + $"Database={dbName}"))
+			{
 				foreach (var statement in createTablesPart.Split("\r\n\r\n",
 					StringSplitOptions.RemoveEmptyEntries))
 				{
@@ -61,14 +67,6 @@ namespace SQLJudge.SubmissionCheckerLib
 						db.ExecuteQuery(statement, false);
 					}
 				}
-
-				db.ExecuteQuery(createDatabasePart, false);
-			}
-
-			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
-				configuration.GetConnectionString(dbms) + $"Database={dbName}"))
-			{
-				db.ExecuteQuery(createTablesPart, false);
 			}
 
 			return true;
