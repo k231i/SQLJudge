@@ -25,7 +25,7 @@ namespace SQLJudge.DatabaseLib.PostgreSQL
 
 			if (!select)
 			{
-				var cmd = new NpgsqlCommand(query);
+				var cmd = new NpgsqlCommand(query, (NpgsqlConnection)Connection);
 
 				if (timeLimit > 0)
 				{

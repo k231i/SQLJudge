@@ -44,14 +44,10 @@ namespace SQLJudge.SubmissionCheckerLib
 
 					db.ExecuteQuery($"DROP DATABASE {dbName};", false);
 				}
-			}
 
-			(createDatabasePart, createTablesPart) =
-				PrepareDbCreationScript(dbCreationScript, dbName);
+				(createDatabasePart, createTablesPart) =
+					PrepareDbCreationScript(dbCreationScript, dbName);
 
-			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
-				configuration.GetConnectionString(dbms)))
-			{
 				db.ExecuteQuery(createDatabasePart, false);
 			}
 
