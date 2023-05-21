@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 using Microsoft.Extensions.Configuration;
+using SQLJudge.DatabaseLib.PostgreSQL;
 
 namespace SQLJudge.SubmissionCheckerLib
 {
@@ -47,6 +48,19 @@ namespace SQLJudge.SubmissionCheckerLib
 
 				(createDatabasePart, createTablesPart) =
 					PrepareDbCreationScript(dbCreationScript, dbName);
+
+				foreach (var statement in createTablesPart.Split("\r\n\r\n",
+					StringSplitOptions.RemoveEmptyEntries))
+				{
+					if (statement.StartsWith("COPY", StringComparison.CurrentCultureIgnoreCase))
+					{
+						((PostgresDatabaseProvider)db).Copy(statement);
+					}
+					else
+					{
+						db.ExecuteQuery(statement, false);
+					}
+				}
 
 				db.ExecuteQuery(createDatabasePart, false);
 			}

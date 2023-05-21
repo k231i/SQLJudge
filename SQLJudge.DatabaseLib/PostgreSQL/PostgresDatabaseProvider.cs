@@ -50,6 +50,16 @@ namespace SQLJudge.DatabaseLib.PostgreSQL
 			return result;
 		}
 
+		public void Copy(string query)
+		{
+			var statements = query.Split("\r\n", 2);
+
+			using (var copy = ((NpgsqlConnection)Connection).BeginTextImport(statements[0]))
+			{
+				copy.Write(statements[1]);
+			}
+		}
+
 		public override bool CheckDatabaseExists(string databaseName)
 		{
 			var command = new NpgsqlCommand(
