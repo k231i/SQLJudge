@@ -17,6 +17,7 @@ namespace SQLJudge.ApiServer.Controllers
 			_configuration = configuration;
 		}
 
+		[HttpPost("check/{submissionIds}")]
 		public ActionResult CheckSubmissions(IEnumerable<int> submissionIds)
 		{
 			if (submissionIds is null || !submissionIds.Any())
