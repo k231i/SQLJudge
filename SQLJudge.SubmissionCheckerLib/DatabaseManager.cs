@@ -44,10 +44,14 @@ namespace SQLJudge.SubmissionCheckerLib
 
 					db.ExecuteQuery($"DROP DATABASE {dbName};", false);
 				}
+			}
 
-				(createDatabasePart, createTablesPart) =
-					PrepareDbCreationScript(dbCreationScript, dbName);
+			(createDatabasePart, createTablesPart) =
+				PrepareDbCreationScript(dbCreationScript, dbName);
 
+			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
+				configuration.GetConnectionString(dbms)))
+			{
 				db.ExecuteQuery(createDatabasePart, false);
 			}
 
@@ -62,7 +66,7 @@ namespace SQLJudge.SubmissionCheckerLib
 
 		public static (string, string) PrepareDbCreationScript(string script, string dbName)
 		{
-			string createDatabasePart = $"CREATE DATABASE {dbName}";
+			string createDatabasePart = $"CREATE DATABASE {dbName};";
 
 			if (!script.Contains("CREATE DATABASE", StringComparison.CurrentCultureIgnoreCase))
 			{
