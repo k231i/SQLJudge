@@ -56,7 +56,8 @@ namespace SQLJudge.DatabaseLib.PostgreSQL
 
 			using (var copy = ((NpgsqlConnection)Connection).BeginTextImport(statements[0]))
 			{
-				copy.Write(statements[1]);
+				copy.Write(statements[1].Remove(
+					statements[1].TrimEnd().LastIndexOf(Environment.NewLine)));
 			}
 		}
 
