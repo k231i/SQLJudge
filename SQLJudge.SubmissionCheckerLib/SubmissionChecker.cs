@@ -44,7 +44,7 @@ namespace SQLJudge.SubmissionCheckerLib
 						, js.id AS sqljsubmissionid
 					FROM mdl_database_sqlj jdb
 					JOIN mdl_assignment_sqlj ja
-						ON jdb.id = ja.database
+						ON jdb.id = ja.testdb
 					JOIN mdl_assign a
 						ON ja.assignment = a.id
 					JOIN mdl_assign_submission s
