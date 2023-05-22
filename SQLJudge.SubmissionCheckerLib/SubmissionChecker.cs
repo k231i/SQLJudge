@@ -67,7 +67,7 @@ namespace SQLJudge.SubmissionCheckerLib
 				correctAnswer = select["correctanswer"].ToString();
 				correctOutput = select["correctoutput"] == DBNull.Value 
 					? null
-					: select["correctoutput"];
+					: select["correctoutput"].ToString();
 				mustContain = select["mustcontain"].ToString();
 				input = select["input"].ToString();
 				sqljSubmissionId = (long)select["sqljsubmissionid"];
