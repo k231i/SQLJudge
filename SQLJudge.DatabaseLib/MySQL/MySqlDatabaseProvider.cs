@@ -17,6 +17,7 @@ namespace SQLJudge.DatabaseLib.MySQL
 			: base(connectionString)
 		{
 			Connection = new MySqlConnection(connectionString);
+			Connection.Open();
 		}
 
 		public override DbTransaction BeginTransaction()
