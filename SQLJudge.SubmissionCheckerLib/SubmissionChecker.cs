@@ -176,6 +176,9 @@ namespace SQLJudge.SubmissionCheckerLib
 				}
 			}
 
+			// to get rid of boxed long/int/short comparisons
+			inputResult = JsonConvert.DeserializeObject<DataSet>(JsonConvert.SerializeObject(inputResult));
+
 			if (correctOutputResult.Tables.Count != inputResult.Tables.Count)
 			{
 				SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
@@ -214,8 +217,7 @@ namespace SQLJudge.SubmissionCheckerLib
 				{
 					for (int c = 0; c < correctOutputResult.Tables[t].Columns.Count; c++)
 					{
-						if (!Equals(correctOutputResult.Tables[t].Rows[r][c],
-							inputResult.Tables[t].Rows[r][c]))
+						if (correctOutputResult.Tables[t].Rows[r][c] != inputResult.Tables[t].Rows[r][c])
 						{
 							SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, "");
 							return;
