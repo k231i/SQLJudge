@@ -133,7 +133,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			}
 
 			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
-				ConfigurationManager.ConnectionStrings[dbms].ConnectionString))
+				configuration.GetConnectionString(dbms))
 			{
 				if (!db.CheckDatabaseExists(dbName))
 				{
