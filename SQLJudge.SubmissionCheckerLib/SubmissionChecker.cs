@@ -217,7 +217,7 @@ namespace SQLJudge.SubmissionCheckerLib
 				{
 					for (int c = 0; c < correctOutputResult.Tables[t].Columns.Count; c++)
 					{
-						if (correctOutputResult.Tables[t].Rows[r][c] != inputResult.Tables[t].Rows[r][c])
+						if (!correctOutputResult.Tables[t].Rows[r][c].Equals(inputResult.Tables[t].Rows[r][c]))
 						{
 							SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, "");
 							return;
