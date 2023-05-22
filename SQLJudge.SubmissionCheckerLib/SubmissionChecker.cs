@@ -28,7 +28,7 @@ namespace SQLJudge.SubmissionCheckerLib
 		{
 			long dbId, sqljSubmissionId;
 			int timeLimit;
-			string dbName, dbms, checkScript, correctAnswer, correctOutput, mustContain, input;
+			string? dbName, dbms, checkScript, correctAnswer, correctOutput, mustContain, input;
 
 			using (var db = DatabaseProviderFactory.GetProvider("MySqlDatabaseProvider",
 				configuration.GetConnectionString("MoodleDB")))
@@ -65,8 +65,8 @@ namespace SQLJudge.SubmissionCheckerLib
 				timeLimit = (int)select["timelimit"];
 				checkScript = (string)select["checkscript"];
 				correctAnswer = (string)select["correctanswer"];
-				correctOutput = (string)select["correctoutput"];
-				mustContain = (string)select["mustcontain"];
+				correctOutput = (string?)select["correctoutput"];
+				mustContain = (string?)select["mustcontain"];
 				input = (string)select["input"];
 				sqljSubmissionId = (long)select["sqljsubmissionid"];
 			}
