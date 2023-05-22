@@ -26,7 +26,8 @@ namespace SQLJudge.SubmissionCheckerLib
 
 		public static void CheckSubmission(IConfiguration configuration, int submissionId)
 		{
-			int dbId, timeLimit, sqljSubmissionId;
+			long dbId, sqljSubmissionId;
+			int timeLimit;
 			string dbName, dbms, checkScript, correctAnswer, correctOutput, mustContain, input;
 
 			using (var db = DatabaseProviderFactory.GetProvider("MySqlDatabaseProvider",
@@ -58,7 +59,7 @@ namespace SQLJudge.SubmissionCheckerLib
 						AND t.onlinetext <> '';
 					""").Tables[0].Rows[0];
 
-				dbId = (int)select["dbid"];
+				dbId = (long)select["dbid"];
 				dbName = $"db{dbId}";
 				dbms = (string)select["dbms"];
 				timeLimit = (int)select["timelimit"];
@@ -67,7 +68,7 @@ namespace SQLJudge.SubmissionCheckerLib
 				correctOutput = (string)select["correctoutput"];
 				mustContain = (string)select["mustcontain"];
 				input = (string)select["input"];
-				sqljSubmissionId = (int)select["sqljsubmissionid"];
+				sqljSubmissionId = (long)select["sqljsubmissionid"];
 			}
 
 			if (input.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
@@ -182,7 +183,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			string dbms, 
 			string correctAnswer,
 			string checkScript,
-			int sqljSubmissionId)
+			long sqljSubmissionId)
 		{
 			string correctOutput;
 
@@ -213,7 +214,7 @@ namespace SQLJudge.SubmissionCheckerLib
 
 		public static void SetStatus(
 			IConfiguration configuration, 
-			int sqljSubmissionId, 
+			long sqljSubmissionId, 
 			SqljSubmissionStatus status, 
 			string output)
 		{

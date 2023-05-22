@@ -14,7 +14,7 @@ namespace SQLJudge.SubmissionCheckerLib
 {
 	public static class DatabaseManager
 	{
-		public static bool CreateDatabase(IConfiguration configuration, int databaseId, bool forceCreate = false)
+		public static bool CreateDatabase(IConfiguration configuration, long databaseId, bool forceCreate = false)
 		{
 			var dbName = $"db{databaseId}";
 			string dbms, dbCreationScript, createDatabasePart, createTablesPart;
