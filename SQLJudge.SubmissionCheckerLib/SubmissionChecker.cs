@@ -94,9 +94,13 @@ namespace SQLJudge.SubmissionCheckerLib
 					continue;
 				}
 
-				if (item.StartsWith('!') && input.Contains(item.Substring(1)))
+				if (item.StartsWith('!'))
 				{
-					mustNotContainList.Add(item.Substring(1));
+					if (input.Contains(item.Substring(1)))
+					{
+						mustNotContainList.Add(item.Substring(1));
+					}
+
 					continue;
 				}
 
