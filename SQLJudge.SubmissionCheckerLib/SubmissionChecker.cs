@@ -26,7 +26,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			UnknownError = 6
 		}
 
-		public static void CheckSubmission(IConfiguration configuration, int submissionId)
+		public static void CheckSubmission(IConfiguration configuration, long submissionId)
 		{
 			long dbId, sqljSubmissionId, assignId;
 			int timeLimit;

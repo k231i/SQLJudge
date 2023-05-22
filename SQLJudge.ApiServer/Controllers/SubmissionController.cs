@@ -18,14 +18,14 @@ namespace SQLJudge.ApiServer.Controllers
 		}
 
 		[HttpPost("check")]
-		public ActionResult CheckSubmissions([FromQuery(Name = "submissionIds")] IEnumerable<int> submissionIds)
+		public ActionResult CheckSubmissions([FromQuery(Name = "submissionIds")] IEnumerable<long> submissionIds)
 		{
 			if (submissionIds is null || !submissionIds.Any())
 			{
 				return Empty;
 			}
 
-			var failedSubmissionIds = new List<int>();
+			var failedSubmissionIds = new List<long>();
 
 			foreach (var submissionId in submissionIds)
 			{
@@ -49,31 +49,31 @@ namespace SQLJudge.ApiServer.Controllers
 		}
 
 		[HttpPost("correctoutput")]
-		public ActionResult GenerateCorrectOutput([FromQuery(Name = "submissionId")] IEnumerable<int> submissionIds)
+		public ActionResult GenerateCorrectOutput([FromQuery(Name = "assignIds")] IEnumerable<long> assignIds)
 		{
-			if (submissionIds is null || !submissionIds.Any())
+			if (assignIds is null || !assignIds.Any())
 			{
 				return Empty;
 			}
 
-			var failedSubmissionIds = new List<int>();
+			var failedAssignIds = new List<long>();
 
-			foreach (var submissionId in submissionIds)
+			foreach (var assignId in assignIds)
 			{
 				try
 				{
-					SubmissionChecker.GenerateCorrectOutput(_configuration, submissionId);
+					SubmissionChecker.GenerateCorrectOutput(_configuration, assignId);
 				}
 				catch (Exception ex)
 				{
-					failedSubmissionIds.Add(submissionId);
-					_logger.LogError(ex, "Submission Id: {submissionId}", submissionId);
+					failedAssignIds.Add(assignId);
+					_logger.LogError(ex, "Assignment Id: {assignId}", assignId);
 				}
 			}
 
-			if (failedSubmissionIds.Any())
+			if (failedAssignIds.Any())
 			{
-				return UnprocessableEntity(failedSubmissionIds);
+				return UnprocessableEntity(failedAssignIds);
 			}
 
 			return Ok();
