@@ -8,6 +8,8 @@ using SQLJudge.DatabaseLib;
 using Newtonsoft.Json;
 using System.Data;
 using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace SQLJudge.SubmissionCheckerLib
 {
@@ -69,7 +71,7 @@ namespace SQLJudge.SubmissionCheckerLib
 					? null
 					: select["correctoutput"].ToString();
 				mustContain = select["mustcontain"].ToString();
-				input = select["input"].ToString();
+				input = Regex.Replace(select["input"].ToString(), "<.*?>", " ");
 				sqljSubmissionId = (long)select["sqljsubmissionid"];
 			}
 
@@ -174,13 +176,55 @@ namespace SQLJudge.SubmissionCheckerLib
 				}
 			}
 
-			if (AreDataSetsEqual(correctOutputResult, inputResult))
+			if (correctOutputResult.Tables.Count != inputResult.Tables.Count)
 			{
-				SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.Accepted, "");
+				SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
+					Incorrect number of tables.
+					Expected: {correctOutputResult.Tables.Count}
+					Actual: {inputResult.Tables.Count}
+					""");
 				return;
 			}
 
-			SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, "");
+			for (var t = 0; t < correctOutputResult.Tables.Count; t++)
+			{
+				if (correctOutputResult.Tables[t].Columns.Count !=
+					inputResult.Tables[t].Columns.Count)
+				{
+					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
+						Incorrect number of columns in table {t + 1}.
+						Expected: {correctOutputResult.Tables[t].Columns.Count}
+						Actual: {inputResult.Tables[t].Columns.Count}
+						""");
+					return;
+				}
+
+				if (correctOutputResult.Tables[t].Rows.Count !=
+					inputResult.Tables[t].Rows.Count)
+				{
+					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
+						Incorrect number of rows in table {t + 1}.
+						Expected: {correctOutputResult.Tables[t].Rows.Count}
+						Actual: {inputResult.Tables[t].Rows.Count}
+						""");
+					return;
+				}
+
+				for (int r = 0; r < correctOutputResult.Tables[t].Rows.Count; r++)
+				{
+					for (int c = 0; c < correctOutputResult.Tables[t].Columns.Count; c++)
+					{
+						if (!Equals(correctOutputResult.Tables[t].Rows[r][c],
+							inputResult.Tables[t].Rows[r][c]))
+						{
+							SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, "");
+							return;
+						}
+					}
+				}
+			}
+
+			SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.Accepted, "");
 		}
 
 		public static string GenerateCorrectOutput(
@@ -235,31 +279,6 @@ namespace SQLJudge.SubmissionCheckerLib
 					WHERE id = {sqljSubmissionId};
 					""", false);
 			}
-		}
-
-		public static bool AreDataSetsEqual(DataSet ds1, DataSet ds2)
-		{
-			if (ds1.Tables.Count != ds2.Tables.Count)
-				return false;
-
-			for (var i = 0; i < ds1.Tables.Count; i++)
-				if (!AreTablesEqual(ds1.Tables[i], ds2.Tables[i]))
-					return false;
-
-			return true;
-		}
-
-		public static bool AreTablesEqual(DataTable t1, DataTable t2)
-		{
-			if (t1.Rows.Count != t2.Rows.Count || t1.Columns.Count != t2.Columns.Count)
-				return false;
-
-			for (int i = 0; i < t1.Rows.Count; i++)
-				for (int c = 0; c < t1.Columns.Count; c++)
-					if (!Equals(t1.Rows[i][c], t2.Rows[i][c]))
-						return false;
-
-			return true;
 		}
 	}
 }
