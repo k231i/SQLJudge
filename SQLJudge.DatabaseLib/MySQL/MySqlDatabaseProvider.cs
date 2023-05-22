@@ -31,7 +31,8 @@ namespace SQLJudge.DatabaseLib.MySQL
 
 			if (!select)
 			{
-				var cmd = new MySqlCommand(query);
+				var cmd = new MySqlCommand(query, 
+					(MySqlConnection)Connection);
 
 				if (timeLimit > 0)
 				{
