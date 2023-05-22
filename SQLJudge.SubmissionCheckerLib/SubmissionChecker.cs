@@ -28,7 +28,7 @@ namespace SQLJudge.SubmissionCheckerLib
 
 		public static void CheckSubmission(IConfiguration configuration, int submissionId)
 		{
-			long dbId, sqljSubmissionId;
+			long dbId, sqljSubmissionId, assignId;
 			int timeLimit;
 			string dbName, dbms, checkScript, correctAnswer, correctOutput, mustContain, input;
 
@@ -43,6 +43,7 @@ namespace SQLJudge.SubmissionCheckerLib
 						, ja.correctanswer AS correctanswer
 						, ja.correctoutput AS correctoutput
 						, ja.mustcontain AS mustcontain
+						, a.id AS assignid
 						, t.onlinetext AS input
 						, js.id AS sqljsubmissionid
 					FROM mdl_database_sqlj jdb
@@ -71,6 +72,7 @@ namespace SQLJudge.SubmissionCheckerLib
 					? null
 					: select["correctoutput"].ToString();
 				mustContain = select["mustcontain"].ToString();
+				assignId = (long)select["assignid"];
 				input = Regex.Replace(select["input"].ToString(), "<.*?>", " ");
 				sqljSubmissionId = (long)select["sqljsubmissionid"];
 			}
@@ -146,7 +148,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			if (string.IsNullOrEmpty(correctOutput))
 			{
 				correctOutput = GenerateCorrectOutput(
-					configuration, dbName, dbms, correctAnswer, checkScript, sqljSubmissionId);
+					configuration, dbName, dbms, correctAnswer, checkScript, assignId);
 			}
 
 			var correctOutputResult = JsonConvert.DeserializeObject<DataSet>(correctOutput);
@@ -235,7 +237,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			string dbms, 
 			string correctAnswer,
 			string checkScript,
-			long sqljSubmissionId)
+			long assignId)
 		{
 			string correctOutput;
 
@@ -255,13 +257,40 @@ namespace SQLJudge.SubmissionCheckerLib
 				configuration.GetConnectionString("MoodleDB")))
 			{
 				db.ExecuteQuery($"""
-					UPDATE mdl_assignment_sqlj_submission
-					SET output = '{correctOutput.Replace("'", "''")}'
-					WHERE id = {sqljSubmissionId}
+					UPDATE mdl_assignment_sqlj
+					SET correctoutput = '{correctOutput.Replace("'", "''")}'
+					WHERE id = {assignId}
 					""", false);
 			}
 
 			return correctOutput;
+		}
+
+		public static void GenerateCorrectOutput(IConfiguration configuration, long assignId)
+		{
+			string correctAnswer, checkScript, dbName, dbms;
+
+			using (var db = DatabaseProviderFactory.GetProvider("MySqlDatabaseProvider",
+				configuration.GetConnectionString("MoodleDB")))
+			{
+				var select = db.ExecuteQuery($"""
+					SELECT ja.correctanswer AS correctanswer
+						, ja.checkscript AS checkscript
+						, jdb.id AS dbid
+						, jdb.dbms AS dbms
+					FROM mdl_assignment_sqlj ja
+					JOIN mdl_database_sqlj jdb
+						ON jdb.id = ja.testdb
+					WHERE ja.assignment = {assignId};
+					""").Tables[0].Rows[0];
+
+				correctAnswer = select["correctanswer"].ToString();
+				checkScript = select["checkscript"].ToString();
+				dbName = $"db{(long)select["dbid"]}";
+				dbms = select["dbms"].ToString();
+			}
+
+			GenerateCorrectOutput(configuration, dbName, dbms, correctAnswer, checkScript, assignId);
 		}
 
 		public static void SetStatus(

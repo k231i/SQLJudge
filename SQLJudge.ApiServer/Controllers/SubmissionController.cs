@@ -47,5 +47,36 @@ namespace SQLJudge.ApiServer.Controllers
 
 			return Ok();
 		}
+
+		[HttpPost("correctoutput")]
+		public ActionResult GenerateCorrectOutput([FromQuery(Name = "submissionId")] IEnumerable<int> submissionIds)
+		{
+			if (submissionIds is null || !submissionIds.Any())
+			{
+				return Empty;
+			}
+
+			var failedSubmissionIds = new List<int>();
+
+			foreach (var submissionId in submissionIds)
+			{
+				try
+				{
+					SubmissionChecker.GenerateCorrectOutput(_configuration, submissionId);
+				}
+				catch (Exception ex)
+				{
+					failedSubmissionIds.Add(submissionId);
+					_logger.LogError(ex, "Submission Id: {submissionId}", submissionId);
+				}
+			}
+
+			if (failedSubmissionIds.Any())
+			{
+				return UnprocessableEntity(failedSubmissionIds);
+			}
+
+			return Ok();
+		}
 	}
 }
