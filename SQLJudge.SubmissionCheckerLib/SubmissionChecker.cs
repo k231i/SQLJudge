@@ -81,7 +81,7 @@ namespace SQLJudge.SubmissionCheckerLib
 				.Any(x => x.StartsWith("\\")))
 			{
 				SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.ContainsRestrictedFunctions, """
-					Answer contains functions starting with \
+					<h5>Answer contains functions starting with \</h5>
 					""");
 
 				return;
@@ -118,21 +118,29 @@ namespace SQLJudge.SubmissionCheckerLib
 
 			if (mustNotContainList.Any())
 			{
-				outputMessage += "Answer contains the following banned keywords/phrases:\n" +
-					string.Join("\n", mustNotContainList) + "\n";
+				outputMessage += $"""
+					<h5>Answer contains the following <u>banned</u> keywords/phrases:</h5>
+					<pre>
+					{string.Join("\n", mustNotContainList)}
+					</pre>
+					""";
 			}
 			
 			if (mustContainList.Any())
 			{
-				outputMessage += "Answer does not contain the following required keywords/phrases:\n" +
-					string.Join("\n", mustContainList) + "\n";
+				outputMessage += $"""
+					<h5>Answer does not contain the following <u>required</u> keywords/phrases:</h5>
+					<pre>
+					{string.Join("\n", mustContainList)}
+					</pre>
+					""";
 			}
 
 			if (!string.IsNullOrEmpty(outputMessage))
 			{
 				SetStatus(configuration, sqljSubmissionId,
 					SqljSubmissionStatus.BannedOrRequiredWordsContent,
-					outputMessage.TrimEnd('\n'));
+					outputMessage);
 				return;
 			}
 
@@ -167,7 +175,7 @@ namespace SQLJudge.SubmissionCheckerLib
 				catch
 				{
 					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.TimeLimitExceeded, $"""
-						Time limit of {timeLimit} seconds has been exceeded, or an unknown error occured
+						<h5>Time limit of {timeLimit} seconds has been exceeded, or an unknown error occured</h5>
 						""");
 
 					return;
@@ -184,9 +192,9 @@ namespace SQLJudge.SubmissionCheckerLib
 			if (correctOutputResult.Tables.Count != inputResult.Tables.Count)
 			{
 				SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
-					Incorrect number of tables.
-					Expected: {correctOutputResult.Tables.Count}
-					Actual: {inputResult.Tables.Count}
+					<h5>Incorrect number of tables</h5>
+					<p>Expected: {correctOutputResult.Tables.Count}</p>
+					<p>Actual: {inputResult.Tables.Count}</p>
 					""");
 				return;
 			}
@@ -197,9 +205,11 @@ namespace SQLJudge.SubmissionCheckerLib
 					inputResult.Tables[t].Columns.Count)
 				{
 					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
-						Incorrect number of columns in table {t + 1}.
-						Expected: {correctOutputResult.Tables[t].Columns.Count}
-						Actual: {inputResult.Tables[t].Columns.Count}
+						<h5>Incorrect number of columns in table {t + 1}</h5>
+						<p>Expected: {correctOutputResult.Tables[t].Columns.Count}</p>
+						{DataTableToHtml(correctOutputResult.Tables[t])}
+						<p>Actual: {inputResult.Tables[t].Columns.Count}</p>
+						{DataTableToHtml(inputResult.Tables[t])}
 						""");
 					return;
 				}
@@ -208,9 +218,11 @@ namespace SQLJudge.SubmissionCheckerLib
 					inputResult.Tables[t].Rows.Count)
 				{
 					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
-						Incorrect number of rows in table {t + 1}.
-						Expected: {correctOutputResult.Tables[t].Rows.Count}
-						Actual: {inputResult.Tables[t].Rows.Count}
+						<h5>Incorrect number of rows in table {t + 1}</5>
+						<p>Expected: {correctOutputResult.Tables[t].Rows.Count}</p>
+						{DataTableToHtml(correctOutputResult.Tables[t])}
+						<p>Actual: {inputResult.Tables[t].Rows.Count}</p>
+						{DataTableToHtml(inputResult.Tables[t])}
 						""");
 					return;
 				}
@@ -221,7 +233,13 @@ namespace SQLJudge.SubmissionCheckerLib
 					{
 						if (!correctOutputResult.Tables[t].Rows[r][c].Equals(inputResult.Tables[t].Rows[r][c]))
 						{
-							SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, "");
+							SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
+								<h5>Wrong answer in table {t + 1}</h5>
+								<p>Correct result</p>
+								{DataTableToHtml(correctOutputResult.Tables[t])}
+								<p>Your result</p>
+								{DataTableToHtml(inputResult.Tables[t])}
+								""");
 							return;
 						}
 					}
@@ -310,6 +328,30 @@ namespace SQLJudge.SubmissionCheckerLib
 					WHERE id = {sqljSubmissionId};
 					""", false);
 			}
+		}
+
+		public static string DataTableToHtml(DataTable table)
+		{
+			var sb = new StringBuilder();
+
+			sb.Append("<table>");
+
+			sb.Append("<tr>");
+			for (int i = 0; i < table.Columns.Count; i++)
+				sb.Append($"<td><b>{table.Columns[i].ColumnName}</b></td>");
+			sb.Append("</tr>");
+			
+			for (int i = 0; i < table.Rows.Count; i++)
+			{
+				sb.Append("<tr>");
+				for (int j = 0; j < table.Columns.Count; j++)
+					sb.Append($"<td>{table.Rows[i][j]}</td>");
+				sb.Append("</tr>");
+			}
+
+			sb.Append("</table>");
+
+			return sb.ToString();
 		}
 	}
 }
