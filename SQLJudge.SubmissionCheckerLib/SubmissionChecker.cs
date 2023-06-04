@@ -1,14 +1,8 @@
-﻿using System;
-using System.Configuration;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SQLJudge.DatabaseLib;
+﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using SQLJudge.DatabaseLib;
 using System.Data;
-using Microsoft.Extensions.Configuration;
-using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SQLJudge.SubmissionCheckerLib
@@ -28,6 +22,7 @@ namespace SQLJudge.SubmissionCheckerLib
 
 		public static void CheckSubmission(IConfiguration configuration, long submissionId)
 		{
+			#region prepare
 			long dbId, sqljSubmissionId, assignId;
 			int timeLimit;
 			string dbName, dbms, checkScript, correctAnswer, correctOutput, mustContain, input;
@@ -76,7 +71,9 @@ namespace SQLJudge.SubmissionCheckerLib
 				input = Regex.Replace(select["input"].ToString(), "<.*?>", " ");
 				sqljSubmissionId = (long)select["sqljsubmissionid"];
 			}
+			#endregion
 
+			#region check restricted functions
 			if (input.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
 				.Any(x => x.StartsWith("\\")))
 			{
@@ -86,7 +83,9 @@ namespace SQLJudge.SubmissionCheckerLib
 
 				return;
 			}
+			#endregion
 
+			#region check banned/required keywords
 			var mustContainList = new List<string>();
 			var mustNotContainList = new List<string>();
 
@@ -143,7 +142,9 @@ namespace SQLJudge.SubmissionCheckerLib
 					outputMessage);
 				return;
 			}
+			#endregion
 
+			#region create db and/or correct output if needed
 			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
 				configuration.GetConnectionString(dbms)))
 			{
@@ -158,7 +159,21 @@ namespace SQLJudge.SubmissionCheckerLib
 				correctOutput = GenerateCorrectOutput(
 					configuration, dbName, dbms, correctAnswer, checkScript, assignId);
 			}
+			else if (correctOutput != GenerateCorrectOutput(
+				configuration, dbName, dbms, correctAnswer, checkScript, assignId))
+			{
+				using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
+					configuration.GetConnectionString(dbms)))
+				{
+					DatabaseManager.CreateDatabase(configuration, dbId, true);
+				}
 
+				correctOutput = GenerateCorrectOutput(
+					configuration, dbName, dbms, correctAnswer, checkScript, assignId);
+			}
+			#endregion
+
+			#region run input script
 			var correctOutputResult = JsonConvert.DeserializeObject<DataSet>(correctOutput);
 			DataSet inputResult;
 
@@ -188,7 +203,9 @@ namespace SQLJudge.SubmissionCheckerLib
 
 			// to get rid of boxed long/int/short comparisons
 			inputResult = JsonConvert.DeserializeObject<DataSet>(JsonConvert.SerializeObject(inputResult));
+			#endregion
 
+			#region compare result with correct one
 			if (correctOutputResult.Tables.Count != inputResult.Tables.Count)
 			{
 				SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
@@ -245,6 +262,7 @@ namespace SQLJudge.SubmissionCheckerLib
 					}
 				}
 			}
+			#endregion
 
 			SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.Accepted, "");
 		}

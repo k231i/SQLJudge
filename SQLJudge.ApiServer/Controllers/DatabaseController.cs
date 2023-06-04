@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SQLJudge.SubmissionCheckerLib;
-using System.Configuration;
 
 namespace SQLJudge.ApiServer.Controllers
 {
