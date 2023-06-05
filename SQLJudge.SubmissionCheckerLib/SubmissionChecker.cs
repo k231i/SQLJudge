@@ -262,9 +262,9 @@ namespace SQLJudge.SubmissionCheckerLib
 					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
 								<h5>Wrong answer in table {t + 1}</h5>
 								<p>Correct result</p>
-								{DataTableToHtml(correctOutputResult.Tables[t])}
+								{DataTableToHtml(correctOutputResult.Tables[t], wrongCells)}
 								<p>Your result</p>
-								{DataTableToHtml(inputResult.Tables[t])}
+								{DataTableToHtml(inputResult.Tables[t], wrongCells)}
 								""");
 					return;
 				}
@@ -400,7 +400,7 @@ namespace SQLJudge.SubmissionCheckerLib
 				for (var j = 0; j < table.Columns.Count; j++)
 				{
 					sb.Append("<td");
-					sb.Append(highlightCells.Remove((i, j)) ? "class=\"table-danger\">" : ">");
+					sb.Append(highlightCells.Contains((i, j)) ? "class=\"table-danger\">" : ">");
 					sb.Append(table.Rows[i][j]);
 					sb.Append("</td>");
 				}
