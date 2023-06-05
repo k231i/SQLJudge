@@ -185,7 +185,7 @@ namespace SQLJudge.SubmissionCheckerLib
 				try
 				{
 					inputResult = db.ExecuteQuery(
-						correctAnswer + "\n" + checkScript, timeLimit: timeLimit);
+						input + "\n" + checkScript, timeLimit: timeLimit);
 				}
 				catch
 				{
