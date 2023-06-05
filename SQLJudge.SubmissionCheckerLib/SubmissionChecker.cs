@@ -400,7 +400,7 @@ namespace SQLJudge.SubmissionCheckerLib
 				for (var j = 0; j < table.Columns.Count; j++)
 				{
 					sb.Append("<td");
-					sb.Append(highlightCells.Contains((i, j)) ? "class=\"table-danger\">" : ">");
+					sb.Append(highlightCells.Contains((i, j)) ? " class=\"table-danger\">" : ">");
 					sb.Append(table.Rows[i][j]);
 					sb.Append("</td>");
 				}
