@@ -7,6 +7,7 @@
 			{
 				"MySqlDatabaseProvider" => new MySQL.MySqlDatabaseProvider(connectionString),
 				"PostgresDatabaseProvider" => new PostgreSQL.PostgresDatabaseProvider(connectionString),
+				"MsSqlDatabaseProvider" => new MSSQL.MsSqlDatabaseProvider(connectionString),
 				_ => throw new ArgumentOutOfRangeException(nameof(providerTypeName))
 			};
 
@@ -15,6 +16,7 @@
 			{
 				"MySQL" => GetProvider("MySqlDatabaseProvider", connectionString),
 				"PostgreSQL" => GetProvider("PostgresDatabaseProvider", connectionString),
+				"MSSQL" => GetProvider("MsSqlDatabaseProvider", connectionString),
 				_ => throw new ArgumentOutOfRangeException(nameof(dbms))
 			};
 	}
