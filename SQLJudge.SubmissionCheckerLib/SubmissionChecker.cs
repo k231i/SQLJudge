@@ -244,22 +244,29 @@ namespace SQLJudge.SubmissionCheckerLib
 					return;
 				}
 
-				for (int r = 0; r < correctOutputResult.Tables[t].Rows.Count; r++)
+				var wrongCells = new List<(int, int)>();
+
+				for (var r = 0; r < correctOutputResult.Tables[t].Rows.Count; r++)
 				{
-					for (int c = 0; c < correctOutputResult.Tables[t].Columns.Count; c++)
+					for (var c = 0; c < correctOutputResult.Tables[t].Columns.Count; c++)
 					{
 						if (!correctOutputResult.Tables[t].Rows[r][c].Equals(inputResult.Tables[t].Rows[r][c]))
 						{
-							SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
+							wrongCells.Add((r, c));
+						}
+					}
+				}
+
+				if (wrongCells.Any())
+				{
+					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.WrongAnswer, $"""
 								<h5>Wrong answer in table {t + 1}</h5>
 								<p>Correct result</p>
 								{DataTableToHtml(correctOutputResult.Tables[t])}
 								<p>Your result</p>
 								{DataTableToHtml(inputResult.Tables[t])}
 								""");
-							return;
-						}
-					}
+					return;
 				}
 			}
 			#endregion
@@ -355,15 +362,48 @@ namespace SQLJudge.SubmissionCheckerLib
 			sb.Append("<table>");
 
 			sb.Append("<tr>");
-			for (int i = 0; i < table.Columns.Count; i++)
+			sb.Append("<td></td>");
+			for (var i = 0; i < table.Columns.Count; i++)
 				sb.Append($"<td><b>{table.Columns[i].ColumnName}</b></td>");
 			sb.Append("</tr>");
 			
-			for (int i = 0; i < table.Rows.Count; i++)
+			for (var i = 0; i < table.Rows.Count; i++)
 			{
 				sb.Append("<tr>");
-				for (int j = 0; j < table.Columns.Count; j++)
+				sb.Append($"<td>{i + 1}</td>");
+				for (var j = 0; j < table.Columns.Count; j++)
 					sb.Append($"<td>{table.Rows[i][j]}</td>");
+				sb.Append("</tr>");
+			}
+
+			sb.Append("</table>");
+
+			return sb.ToString();
+		}
+
+		public static string DataTableToHtml(DataTable table, List<(int, int)> highlightCells)
+		{
+			var sb = new StringBuilder();
+
+			sb.Append("<table>");
+
+			sb.Append("<tr>");
+			sb.Append("<td></td>");
+			for (var i = 0; i < table.Columns.Count; i++)
+				sb.Append($"<td><b>{table.Columns[i].ColumnName}</b></td>");
+			sb.Append("</tr>");
+
+			for (var i = 0; i < table.Rows.Count; i++)
+			{
+				sb.Append("<tr>");
+				sb.Append($"<td>{i + 1}</td>");
+				for (var j = 0; j < table.Columns.Count; j++)
+				{
+					sb.Append("<td");
+					sb.Append(highlightCells.Remove((i, j)) ? "class=\"table-danger\">" : ">");
+					sb.Append(table.Rows[i][j]);
+					sb.Append("</td>");
+				}
 				sb.Append("</tr>");
 			}
 
