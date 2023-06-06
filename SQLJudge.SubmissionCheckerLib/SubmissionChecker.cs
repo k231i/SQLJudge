@@ -359,7 +359,7 @@ namespace SQLJudge.SubmissionCheckerLib
 		{
 			var sb = new StringBuilder();
 
-			sb.Append("<div class=\"overflow-auto\" style=\"max-height: 300px;\"");
+			sb.Append("<div class=\"overflow-auto\" style=\"max-height: 300px;\">");
 			sb.Append("<table>");
 
 			sb.Append("<tr>");
