@@ -359,6 +359,7 @@ namespace SQLJudge.SubmissionCheckerLib
 		{
 			var sb = new StringBuilder();
 
+			sb.Append("<div class=\"overflow-auto\" style=\"max-height: 300px;\"");
 			sb.Append("<table>");
 
 			sb.Append("<tr>");
@@ -377,6 +378,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			}
 
 			sb.Append("</table>");
+			sb.Append("</div>");
 
 			return sb.ToString();
 		}
@@ -385,6 +387,7 @@ namespace SQLJudge.SubmissionCheckerLib
 		{
 			var sb = new StringBuilder();
 
+			sb.Append("<div class=\"overflow-auto\" style=\"max-height: 300px;\"");
 			sb.Append("<table>");
 
 			sb.Append("<tr>");
@@ -408,6 +411,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			}
 
 			sb.Append("</table>");
+			sb.Append("</div>");
 
 			return sb.ToString();
 		}
