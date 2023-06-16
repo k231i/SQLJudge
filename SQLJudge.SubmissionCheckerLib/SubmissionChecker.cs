@@ -336,7 +336,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			GenerateCorrectOutput(configuration, dbName, dbms, correctAnswer, checkScript, assignId);
 		}
 
-		public static void SetStatus(
+		static void SetStatus(
 			IConfiguration configuration, 
 			long sqljSubmissionId, 
 			SqljSubmissionStatus status, 
