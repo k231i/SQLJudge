@@ -1,14 +1,7 @@
-﻿using SQLJudge.DatabaseLib;
-using System;
-using System.Configuration;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using MySql.Data.MySqlClient;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using SQLJudge.DatabaseLib;
 using SQLJudge.DatabaseLib.PostgreSQL;
+using System.Text.RegularExpressions;
 
 namespace SQLJudge.SubmissionCheckerLib
 {
@@ -84,6 +77,30 @@ namespace SQLJudge.SubmissionCheckerLib
 			return (createDatabasePart, Regex.Replace(script, 
 				@"(CREATE\s+DATABASE.*?;|\\c.*?;|USE\s+\w+;)", "", 
 				RegexOptions.IgnoreCase | RegexOptions.Multiline));
+		}
+
+		public static void DropDatabase(IConfiguration configuration, long databaseId)
+		{
+			var dbName = $"db{databaseId}";
+			string dbms;
+
+			using (var db = DatabaseProviderFactory.GetProvider("MySqlDatabaseProvider",
+				configuration.GetConnectionString("MoodleDB")))
+			{
+				var select = db.ExecuteQuery($"""
+					SELECT dbms
+					FROM mdl_database_sqlj 
+					WHERE id = {databaseId};
+					""");
+
+				dbms = (string)select.Tables[0].Rows[0]["dbms"];
+			}
+
+			using (var db = DatabaseProviderFactory.GetProviderByDbms(dbms,
+				configuration.GetConnectionString(dbms)))
+			{
+				db.ExecuteQuery($"DROP DATABASE {dbName};", false);
+			}
 		}
 	}
 }

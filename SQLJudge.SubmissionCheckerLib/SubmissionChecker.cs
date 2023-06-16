@@ -355,7 +355,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			}
 		}
 
-		public static string DataTableToHtml(DataTable table)
+		static string DataTableToHtml(DataTable table)
 		{
 			var sb = new StringBuilder();
 
@@ -383,7 +383,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			return sb.ToString();
 		}
 
-		public static string DataTableToHtml(DataTable table, List<(int, int)> highlightCells)
+		static string DataTableToHtml(DataTable table, List<(int, int)> highlightCells)
 		{
 			var sb = new StringBuilder();
 

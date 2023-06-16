@@ -34,6 +34,24 @@ namespace SQLJudge.ApiServer.Controllers
 			return Created("", null);
 		}
 
+		[HttpPost("drop")]
+		public ActionResult Drop(
+			[FromQuery(Name = "databaseIds")]
+			IEnumerable<long> databaseIds)
+		{
+			if (databaseIds is null || !databaseIds.Any())
+			{
+				return Empty;
+			}
+
+			foreach (var databaseId in databaseIds)
+			{
+				DatabaseManager.DropDatabase(_configuration, databaseId);
+			}
+
+			return Ok();
+		}
+
 		[HttpGet("dbmslist")]
 		public ActionResult<IEnumerable<string>> DbmsList()
 		{
