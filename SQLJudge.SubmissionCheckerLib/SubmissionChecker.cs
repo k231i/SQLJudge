@@ -187,7 +187,7 @@ namespace SQLJudge.SubmissionCheckerLib
 					inputResult = db.ExecuteQuery(
 						input + "\n" + checkScript, timeLimit: timeLimit);
 				}
-				catch
+				catch (Exception ex)
 				{
 					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.TimeLimitExceeded, $"""
 						<h5>Time limit of {timeLimit} seconds has been exceeded, or an unknown error occured</h5>
