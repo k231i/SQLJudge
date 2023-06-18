@@ -72,8 +72,8 @@ namespace SQLJudge.SubmissionCheckerLib
 				input = Regex.Replace(
 					Regex.Replace(
 						string.Join(" ", 
-							HtmlEntity.DeEntitize(select["input"].ToString().Split(' ', 
-								StringSplitOptions.RemoveEmptyEntries))), 
+							HtmlEntity.DeEntitize(select["input"].ToString()).Split(' ', 
+								StringSplitOptions.RemoveEmptyEntries)), 
 						"<p>", "\n"), 
 					"<.*?>", "");
 				sqljSubmissionId = (long)select["sqljsubmissionid"];
