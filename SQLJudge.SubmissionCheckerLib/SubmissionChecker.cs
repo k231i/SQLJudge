@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using SQLJudge.DatabaseLib;
 using System.Data;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -182,6 +183,8 @@ namespace SQLJudge.SubmissionCheckerLib
 				configuration.GetConnectionString(dbms) + $"Database={dbName}"))
 			{
 				var transaction = db.BeginTransaction();
+				var time = new Stopwatch();
+				time.Start();
 
 				try
 				{
@@ -190,8 +193,21 @@ namespace SQLJudge.SubmissionCheckerLib
 				}
 				catch (Exception ex)
 				{
-					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.TimeLimitExceeded, $"""
-						<h5>Time limit of {timeLimit} seconds has been exceeded, or an unknown error occured</h5>
+					time.Stop();
+
+					if (timeLimit > 0 && 
+						time.Elapsed.TotalSeconds > timeLimit)
+					{
+						SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.TimeLimitExceeded, $"""
+							<h5>Time limit of {timeLimit} seconds has been exceeded, or an unknown error occured</h5>
+							""");
+
+						return;
+					}
+
+					SetStatus(configuration, sqljSubmissionId, SqljSubmissionStatus.UnknownError, $"""
+						<h5>An error occured during script execution.</h5>
+						<pre>{ex}</pre>
 						""");
 
 					return;
