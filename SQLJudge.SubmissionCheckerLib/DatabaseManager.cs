@@ -65,7 +65,7 @@ namespace SQLJudge.SubmissionCheckerLib
 			return true;
 		}
 
-		public static (string, string) PrepareDbCreationScript(string script, string dbName)
+		static (string, string) PrepareDbCreationScript(string script, string dbName)
 		{
 			string createDatabasePart = $"CREATE DATABASE {dbName};";
 
