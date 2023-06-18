@@ -70,7 +70,10 @@ namespace SQLJudge.SubmissionCheckerLib
 					: select["correctoutput"].ToString();
 				mustContain = select["mustcontain"].ToString();
 				assignId = (long)select["assignid"];
-				input = Regex.Replace(HtmlEntity.DeEntitize(select["input"].ToString()), "<[^>]+>", " ");
+				input = Regex.Replace(
+					HtmlEntity.DeEntitize(
+						select["input"].ToString().Replace("&nbsp;", " ")), 
+					"<[^>]+>", " ");
 				sqljSubmissionId = (long)select["sqljsubmissionid"];
 			}
 			#endregion
