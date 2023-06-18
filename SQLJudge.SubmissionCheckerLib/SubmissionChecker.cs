@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using HtmlAgilityPack;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using SQLJudge.DatabaseLib;
 using System.Data;
@@ -68,7 +69,7 @@ namespace SQLJudge.SubmissionCheckerLib
 					: select["correctoutput"].ToString();
 				mustContain = select["mustcontain"].ToString();
 				assignId = (long)select["assignid"];
-				input = Regex.Replace(select["input"].ToString(), "<.*?>", " ");
+				input = Regex.Replace(HtmlEntity.DeEntitize(select["input"].ToString()), "<.*?>", " ");
 				sqljSubmissionId = (long)select["sqljsubmissionid"];
 			}
 			#endregion
