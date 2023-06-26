@@ -1,36 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="SQLJudge.DatabaseLib.DatabaseProvider" Collapsed="true">
-    <Position X="3.25" Y="0.5" Width="1.5" />
+  <Class Name="SQLJudge.DatabaseLib.DatabaseProvider">
+    <Position X="3" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAABACAAAAEAAAAAAEAAAAAAAAAAACAAAAAABAA=</HashCode>
       <FileName>DatabaseProvider.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="SQLJudge.DatabaseLib.DatabaseProviderFactory" Collapsed="true">
-    <Position X="7.5" Y="0.5" Width="2" />
+  <Class Name="SQLJudge.DatabaseLib.DatabaseProviderFactory">
+    <Position X="5.5" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAEAAAAAAA=</HashCode>
       <FileName>DatabaseProviderFactory.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SQLJudge.DatabaseLib.MSSQL.MsSqlDatabaseProvider" Collapsed="true">
-    <Position X="5.5" Y="1.75" Width="2" />
+    <Position X="5.5" Y="3.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAABAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAABAA=</HashCode>
       <FileName>MSSQL\MsSqlDatabaseProvider.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SQLJudge.DatabaseLib.MySQL.MySqlDatabaseProvider" Collapsed="true">
-    <Position X="0.5" Y="1.75" Width="2" />
+    <Position X="0.75" Y="3.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAABAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAABAA=</HashCode>
       <FileName>MySQL\MySqlDatabaseProvider.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SQLJudge.DatabaseLib.PostgreSQL.PostgresDatabaseProvider" Collapsed="true">
-    <Position X="3" Y="1.75" Width="2" />
+    <Position X="3" Y="3.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAABAAAAAAAAAAAAAEAAAgAAAAAAAAAAAAAABAA=</HashCode>
       <FileName>PostgreSQL\PostgresDatabaseProvider.cs</FileName>

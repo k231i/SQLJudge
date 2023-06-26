@@ -1,2 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram /> 
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="SQLJudge.SubmissionCheckerLib.DatabaseManager">
+    <Position X="1.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAEQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DatabaseManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SQLJudge.SubmissionCheckerLib.SubmissionChecker">
+    <Position X="4.25" Y="0.5" Width="2.75" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="SQLJudge.SubmissionCheckerLib.SubmissionChecker.SqljSubmissionStatus">
+        <TypeIdentifier>
+          <NewMemberFileName>SubmissionChecker.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAARAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SubmissionChecker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
